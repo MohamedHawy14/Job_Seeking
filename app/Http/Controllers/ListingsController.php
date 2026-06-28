@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class ListingsController extends Controller implements HasMiddleware
 {
@@ -86,11 +85,7 @@ class ListingsController extends Controller implements HasMiddleware
         }
         $data = $request->validated();
         if ($request->hasFile('logo')) {
-            if (! empty($listing->logo) && Storage::exists($listing->logo)) {
-                Storage::delete($listing->logo);
-            }
-            $path = $request->file('logo')->store('listings', 'public');
-            $data['logo'] = $path;
+            $data['logo'] = $request->file('logo')->store('listings', 'public');
         } else {
             unset($data['logo']);
         }
@@ -107,10 +102,6 @@ class ListingsController extends Controller implements HasMiddleware
     {
         if ($listing->user_id != Auth::id()) {
             abort(403, __('main.unauthorized'));
-        }
-
-        if ($listing->logo && Storage::disk('public')->exists($listing->logo)) {
-            Storage::disk('public')->delete($listing->logo);
         }
         $listing->delete();
 
