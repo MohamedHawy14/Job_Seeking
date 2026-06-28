@@ -2,41 +2,38 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\AuthServiceInterface;
 use App\Http\Requests\Login;
 use App\Http\Requests\Register;
-use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    protected AuthServiceInterface $authService;
+
+    public function __construct(AuthServiceInterface $authService)
+    {
+        $this->authService = $authService;
+    }
+
     public function create()
     {
         return view('User.create');
     }
 
-    public function store(Register $register)
+    public function store(Register $register): RedirectResponse
     {
-        $data = $register->validated();
-        $user = User::create($data);
-
-        Auth::login($user);
+        $this->authService->registerUser($register->validated());
 
         return redirect('/')->with('message', __('main.user_created'));
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): RedirectResponse
     {
-        Auth::logout();
-
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
-        // dd('Check if Auth::check() is false');
+        $this->authService->logoutUser($request);
 
         return redirect('/')->with('message', __('main.logged_out'));
-
     }
 
     public function login()
@@ -44,13 +41,11 @@ class UserController extends Controller
         return view('User.login');
     }
 
-    public function authenticate(Login $login)
+    public function authenticate(Login $login): RedirectResponse
     {
-        $data = $login->validated();
+        $isAuthenticated = $this->authService->authenticateUser($login->validated());
 
-        if (Auth::attempt($data)) {
-            request()->session()->regenerate();
-
+        if ($isAuthenticated) {
             return redirect('/')->with('message', __('main.logged_in'));
         }
 

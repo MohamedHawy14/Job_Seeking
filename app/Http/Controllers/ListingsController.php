@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\ListingServiceInterface;
 use App\Http\Requests\Listingstoreandupdate;
 use App\Models\Listing;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,6 +14,13 @@ use Illuminate\Support\Facades\Auth;
 
 class ListingsController extends Controller implements HasMiddleware
 {
+    protected ListingServiceInterface $listingService;
+
+    public function __construct(ListingServiceInterface $listingService)
+    {
+        $this->listingService = $listingService;
+    }
+
     public static function middleware(): array
     {
         return [
@@ -21,89 +28,45 @@ class ListingsController extends Controller implements HasMiddleware
         ];
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('listings.index', [
-            'listings' => Listing::latest()->filter(request(['tag', 'search']))->paginate(2),
-        ]);
+        $listings = $this->listingService->getPaginatedListings(request(['tag', 'search']));
+
+        return view('listings.index', compact('listings'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('listings.create');
-
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Listingstoreandupdate $request)
+    public function store(Listingstoreandupdate $request): RedirectResponse
     {
-        $data = $request->validated();
-        if ($request->hasFile('logo')) {
-            $path = $request->file('logo')->store('listings', 'public');
-            $data['logo'] = $path;
-        }
-
-        $data['user_id'] = Auth::id();
-        Listing::create($data);
+        $this->listingService->storeListing($request->validated(),$request->file('logo'),Auth::id());
 
         return redirect('/')->with('message', __('main.job_created'));
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Listing $listing)
     {
-        return view('listings.show', [
-            'listing' => $listing,
-        ]);
+        return view('listings.show', compact('listing'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Listing $listing)
     {
-        return view('Listings.edit', ['listing' => $listing]);
+        return view('Listings.edit', compact('listing'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Listingstoreandupdate $request, Listing $listing)
+    public function update(Listingstoreandupdate $request, Listing $listing): RedirectResponse
     {
-        if ($listing->user_id != Auth::id()) {
-            abort(403, __('main.unauthorized'));
-        }
-        $data = $request->validated();
-        if ($request->hasFile('logo')) {
-            $data['logo'] = $request->file('logo')->store('listings', 'public');
-        } else {
-            unset($data['logo']);
-        }
-
-        $listing->update($data);
+        $this->listingService->updateListing($listing,$request->validated(),$request->file('logo'),Auth::id());
 
         return redirect('/')->with('message', __('main.job_updated'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request, Listing $listing): JsonResponse|RedirectResponse
     {
-        if ($listing->user_id != Auth::id()) {
-            abort(403, __('main.unauthorized'));
-        }
-        $listing->delete();
+        $this->listingService->deleteListing($listing, Auth::id());
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -116,11 +79,8 @@ class ListingsController extends Controller implements HasMiddleware
 
     public function manage()
     {
-        /** @var User $user */
-        $user = Auth::user();
+        $listings = $this->listingService->getUserListings(Auth::id());
 
-        return view('listings.manage', [
-            'listings' => $user->listings()->get(),
-        ]);
+        return view('listings.manage', compact('listings'));
     }
 }
