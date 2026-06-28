@@ -63,4 +63,9 @@ return [
     'logged_out' => 'تم تسجيل الخروج!',
     'logged_in' => 'تم تسجيل الدخول بنجاح!',
     'unauthorized' => 'إجراء غير مصرح به.',
+    'delete_confirm_title' => 'هل أنت متأكد؟',
+    'delete_confirm_text' => 'أنت على وشك حذف ":title". لا يمكن التراجع عن هذا الإجراء.',
+    'delete_confirm_yes' => 'نعم، احذف',
+    'delete_confirm_cancel' => 'إلغاء',
+    'delete_error' => 'حدث خطأ. يرجى المحاولة مرة أخرى.',
 ];

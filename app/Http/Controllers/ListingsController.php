@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Listingstoreandupdate;
 use App\Models\Listing;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
@@ -100,7 +103,7 @@ class ListingsController extends Controller implements HasMiddleware
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Listing $listing)
+    public function destroy(Request $request, Listing $listing): JsonResponse|RedirectResponse
     {
         if ($listing->user_id != Auth::id()) {
             abort(403, __('main.unauthorized'));
@@ -110,6 +113,12 @@ class ListingsController extends Controller implements HasMiddleware
             Storage::disk('public')->delete($listing->logo);
         }
         $listing->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => __('main.job_deleted'),
+            ]);
+        }
 
         return redirect('/')->with('message', __('main.job_deleted'));
     }

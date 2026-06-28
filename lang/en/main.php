@@ -63,4 +63,9 @@ return [
     'logged_out' => 'You have been logged out!',
     'logged_in' => 'You are now logged in!',
     'unauthorized' => 'Unauthorized action.',
+    'delete_confirm_title' => 'Are you sure?',
+    'delete_confirm_text' => 'You are about to delete ":title". This action cannot be undone.',
+    'delete_confirm_yes' => 'Yes, delete it',
+    'delete_confirm_cancel' => 'Cancel',
+    'delete_error' => 'Something went wrong. Please try again.',
 ];
