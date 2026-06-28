@@ -1,59 +1,53 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+#  Job Seeking Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A sleek, modern, and high-performance job board platform built with **Laravel**. This project moves away from traditional monolithic controller structures, implementing **Clean Architecture** and SOLID design principles heavily inspired by enterprise environments like `.NET Core`.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+##  Key Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+* **Full Localization (Multi-language):** Dynamic English & Arabic support. The application automatically detects the current locale to seamlessly handle text translation and layout directions (**RTL / LTR**).
+* **Thin Controllers:** Business and core application logic are completely decoupled from controllers and abstracted into a dedicated Service Layer.
+* **Complete Job Management (CRUD):**
+  * **Employers:** Can fully create, read, update, and delete (CRUD) only their own job listings.
+  * **Job Seekers:** Can browse jobs, use advanced filter queries (by Tags), and search listings smoothly via integrated Pagination.
+* **Modern UI/UX Design:** Refreshed with a contemporary **Sky Blue / Indigo** theme, clean shadows (`shadow-sm/md/lg`), smooth borders (`rounded-xl`), and optimized typography using **Inter** (for English) and **Cairo** (for Arabic) Google fonts.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+##  Architecture & Advanced Patterns
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+To ensure high maintainability, strict scalability, and seamless testability, the project implements the following architectural patterns:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Service Layer & Dependency Injection (DI)
+All database interactions, session modifications, and file operations are extracted into specific Services that implement loose coupling via Interfaces (Contracts). These are injected directly into the controller constructors using Laravel's IoC Service Container:
+* `ListingServiceInterface` $\rightarrow$ `ListingService`
+* `AuthServiceInterface` $\rightarrow$ `AuthService`
 
-## Laravel Sponsors
+### 2. The Observer Pattern (Single Responsibility)
+To respect the **Single Responsibility Principle (SRP)**, file management is entirely offloaded from both the Controller and Service layers. A dedicated `ListingObserver` actively listens to Eloquent Model Events:
+* **`updating` event:** Automatically intercepts the cycle if a new logo is uploaded, instantly deleting the redundant old logo from disk.
+* **`deleted` event:** When a listing is removed, it automatically deletes its associated files from the storage and cleans up the directory if it becomes empty, preventing server file accumulation ("orphan files").
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. Advanced Request Validation
+Input parsing, data sanitization, and basic authorization checks are abstracted into dedicated Form Request classes (`Listingstoreandupdate`, `Login`, `Register`), protecting the Service layer from receiving malformed input data.
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+##  Key Directory Structure
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```text
+app/
+├── Contracts/              # Interfaces (Architectural Contracts)
+│   ├── AuthServiceInterface.php
+│   └── ListingServiceInterface.php
+├── Services/               # Concrete Implementations of Business Logic
+│   ├── AuthService.php
+│   └── ListingService.php
+├── Observers/              # Model Observers tracking file cleanup pipelines
+│   └── ListingObserver.php
+├── Http/
+│   ├── Controllers/        # Light, decoupled Thin Controllers
+│   └── Requests/           # Strict Form Input Validation Rules
+└── Providers/
+    └── AppServiceProvider.php  # Binding Interfaces to Services (AddScoped Equivalent)
