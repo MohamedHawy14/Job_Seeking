@@ -10,47 +10,50 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    public function create(){
+    public function create()
+    {
         return view('User.create');
     }
 
-    public function store(Register $register){
+    public function store(Register $register)
+    {
         $data = $register->validated();
-        $user= User::create($data);
+        $user = User::create($data);
 
         Auth::login($user);
 
-        return redirect('/')->with('message', 'User created sucessfully And Logged In!');
+        return redirect('/')->with('message', __('main.user_created'));
     }
 
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
         Auth::logout();
 
-    $request->session()->invalidate();
+        $request->session()->invalidate();
 
+        $request->session()->regenerateToken();
 
-    $request->session()->regenerateToken();
+        // dd('Check if Auth::check() is false');
 
-        //dd('Check if Auth::check() is false');
-
-        return redirect('/')->with('message', 'You have been logged out!');
+        return redirect('/')->with('message', __('main.logged_out'));
 
     }
 
-    public function login(){
+    public function login()
+    {
         return view('User.login');
     }
 
     public function authenticate(Login $login)
     {
-    $data = $login->validated();
+        $data = $login->validated();
 
-    if (Auth::attempt($data)) {
-        request()->session()->regenerate();
+        if (Auth::attempt($data)) {
+            request()->session()->regenerate();
 
-        return redirect('/')->with('message', 'You are now logged in!');
-    }
+            return redirect('/')->with('message', __('main.logged_in'));
+        }
 
-    return back()->withErrors(['email' => 'Invalid Credentials'])->onlyInput('email');
+        return back()->withErrors(['email' => __('auth.failed')])->onlyInput('email');
     }
 }

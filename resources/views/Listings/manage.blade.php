@@ -1,42 +1,52 @@
 <x-layout>
-    <x-card class="p-10">
-    <header>
-        <h1 class="text-3xl text-center font-bold my-6 uppercase">
-        Manage Jobs
-        </h1>
-    </header>
+    <x-card class="p-8 sm:p-10 mt-8 mb-8 shadow-md">
+        <header>
+            <h1 class="text-2xl sm:text-3xl text-center font-bold my-6 text-slate-800">
+                {{ __('main.manage_jobs') }}
+            </h1>
+        </header>
 
-    <table class="w-full table-auto rounded-sm">
-        <tbody>
-        @unless($listings->isEmpty())
-        @foreach($listings as $listing)
-        <tr class="border-gray-300">
-            <td class="px-4 py-8 border-t border-b border-gray-300 text-lg">
-            <a href="/listings/{{$listing->id}}"> {{$listing->title}} </a>
-            </td>
-            <td class="px-4 py-8 border-t border-b border-gray-300 text-lg">
-            <a href="/listings/{{$listing->id}}/edit" class="text-blue-400 px-6 py-2 rounded-xl"><i
-                class="fa-solid fa-pen-to-square"></i>
-                Edit</a>
-            </td>
-            <td class="px-4 py-8 border-t border-b border-gray-300 text-lg">
-            <form method="POST" action="/listings/{{$listing->id}}">
-                @csrf
-                @method('DELETE')
-                <button class="text-red-500"><i class="fa-solid fa-trash"></i> Delete</button>
-            </form>
-            </td>
-        </tr>
-        @endforeach
-        @else
-        <tr class="border-gray-300">
-            <td class="px-4 py-8 border-t border-b border-gray-300 text-lg">
-            <p class="text-center">No Jobs Found</p>
-            </td>
-        </tr>
-        @endunless
-
-        </tbody>
-    </table>
+        <div class="overflow-x-auto">
+            <table class="w-full table-auto">
+                <tbody>
+                    @unless ($listings->isEmpty())
+                        @foreach ($listings as $listing)
+                            <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+                                <td class="px-4 py-5 text-base sm:text-lg">
+                                    <a href="/listings/{{ $listing->id }}" class="font-medium hover:text-primary transition-colors">
+                                        {{ $listing->title }}
+                                    </a>
+                                </td>
+                                <td class="px-4 py-5 text-base sm:text-lg">
+                                    <a
+                                        href="/listings/{{ $listing->id }}/edit"
+                                        class="text-primary hover:text-primary-dark font-medium transition-colors"
+                                    >
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                        {{ __('main.edit') }}
+                                    </a>
+                                </td>
+                                <td class="px-4 py-5 text-base sm:text-lg">
+                                    <form method="POST" action="/listings/{{ $listing->id }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-500 hover:text-red-700 font-medium transition-colors">
+                                            <i class="fa-solid fa-trash"></i>
+                                            {{ __('main.delete') }}
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="3" class="px-4 py-8 text-lg text-center text-slate-500">
+                                {{ __('main.no_jobs_manage') }}
+                            </td>
+                        </tr>
+                    @endunless
+                </tbody>
+            </table>
+        </div>
     </x-card>
 </x-layout>

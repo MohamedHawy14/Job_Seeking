@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Requests;
+
 use Illuminate\Foundation\Http\FormRequest;
-use Override;
 
 class Listingstoreandupdate extends FormRequest
 {
@@ -22,33 +22,16 @@ class Listingstoreandupdate extends FormRequest
     public function rules(): array
     {
         return [
-        'titleAr'       => ['required', 'string', 'max:255'],
-        'titleEn'       => ['required', 'string', 'max:255'],
-        'tags'          => ['required', 'string'],
-        'company'       => ['required', 'string'],
-        'location'      => ['required', 'string'],
-        'email'         => ['required', 'email'],
-        'website'       => ['required', 'url'],
-        'descriptionAr' => ['required', 'string'],
-        'descriptionEn' => ['required', 'string'],
-        'logo'          => ['sometimes', 'nullable', 'file', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048']
-    ];
-    }
-
-    #[Override]
-    public function attributes()
-    {
-        return [
-        'titleAr'       => 'العنوان بالعربية',
-        'titleEn'       => 'العنوان بالإنجليزية',
-        'tags'          => 'الوسوم',
-        'company'       => 'اسم الشركة',
-        'location'      => 'الموقع',
-        'email'         => 'البريد الإلكتروني',
-        'website'       => 'رابط الموقع',
-        'descriptionAr' => 'الوصف بالعربية',
-        'descriptionEn' => 'الوصف بالإنجليزية',
-        'logo'          => 'شعار ',
-    ];
+            'titleAr' => ['required', 'string', 'max:255'],
+            'titleEn' => ['required', 'string', 'max:255'],
+            'tags' => ['required', 'string'],
+            'company' => ['required', 'string'],
+            'location' => ['required', 'string'],
+            'email' => ['required', 'email'],
+            'website' => ['required', 'url'],
+            'descriptionAr' => ['required', 'string'],
+            'descriptionEn' => ['required', 'string'],
+            'logo' => ['sometimes', 'nullable', 'file', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+        ];
     }
 }

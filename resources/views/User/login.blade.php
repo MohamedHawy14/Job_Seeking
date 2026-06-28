@@ -1,66 +1,57 @@
 <x-layout>
-    <x-card class="p-10 max-w-lg mx-auto mt-24">
-                    <header class="text-center">
-                        <h2 class="text-2xl font-bold uppercase mb-1">
-                            Login
-                        </h2>
-                        <p class="mb-4">Login to post Jobs</p>
-                    </header>
+    <x-card class="p-8 sm:p-10 max-w-lg mx-auto mt-16 sm:mt-24 shadow-md">
+        <header class="text-center mb-6">
+            <h2 class="text-2xl font-bold mb-2 text-slate-800">
+                {{ __('main.login_title') }}
+            </h2>
+            <p class="text-slate-500">{{ __('main.login_subtitle') }}</p>
+        </header>
 
-                    <form action="/authenticate" method="POST">
-                        @csrf
+        <form action="/authenticate" method="POST" class="space-y-5">
+            @csrf
 
-                        <div class="mb-6">
-                            <label for="email" class="inline-block text-lg mb-2"
-                                >Email</label
-                            >
-                            <input
-                                type="email"
-                                class="border border-gray-200 rounded p-2 w-full"
-                                name="email"
-                                value="{{old('email')}}"
-                            />
-                            @error('email')
-                                <p class="text-red-500 text-xs mt-1">{{$message}}</p>
-                            @enderror
-                        </div>
+            <div>
+                <label for="email" class="block text-sm font-semibold mb-2 text-slate-700">{{ __('main.email') }}</label>
+                <input
+                    type="email"
+                    id="email"
+                    class="border border-slate-200 rounded-xl p-3 w-full focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-shadow"
+                    name="email"
+                    value="{{ old('email') }}"
+                />
+                @error('email')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
 
-                        <div class="mb-6">
-                            <label
-                                for="password"
-                                class="inline-block text-lg mb-2"
-                            >
-                                Password
-                            </label>
-                            <input
-                                type="password"
-                                class="border border-gray-200 rounded p-2 w-full"
-                                name="password"
-                                value="{{old('password')}}"
-                            />
-                            @error('password')
-                                <p class="text-red-500 text-xs mt-1">{{$message}}</p>
-                            @enderror
-                        </div>
+            <div>
+                <label for="password" class="block text-sm font-semibold mb-2 text-slate-700">{{ __('main.password') }}</label>
+                <input
+                    type="password"
+                    id="password"
+                    class="border border-slate-200 rounded-xl p-3 w-full focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-shadow"
+                    name="password"
+                />
+                @error('password')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
 
+            <div>
+                <button
+                    type="submit"
+                    class="w-full bg-primary hover:bg-primary-dark text-white rounded-xl py-3 px-4 font-semibold shadow-sm transition-colors"
+                >
+                    {{ __('main.sign_in') }}
+                </button>
+            </div>
 
-                        <div class="mb-6">
-                            <button
-                                type="submit"
-                                class="bg-laravel text-white rounded py-2 px-4 hover:bg-black"
-                            >
-                                Sign In
-                            </button>
-                        </div>
-
-                        <div class="mt-8">
-                            <p>
-                                Don't have an account?
-                                <a href="/register" class="text-laravel"
-                                    >Register</a
-                                >
-                            </p>
-                        </div>
-                    </form>
+            <div class="text-center pt-2">
+                <p class="text-slate-600">
+                    {{ __('main.no_account') }}
+                    <a href="/register" class="text-primary font-semibold hover:text-primary-dark transition-colors">{{ __('main.register') }}</a>
+                </p>
+            </div>
+        </form>
     </x-card>
 </x-layout>

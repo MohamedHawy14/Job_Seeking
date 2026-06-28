@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Listingstoreandupdate;
 use App\Models\Listing;
+use App\Models\User;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
@@ -17,12 +18,14 @@ class ListingsController extends Controller implements HasMiddleware
             new Middleware('auth', except: ['index', 'show']),
         ];
     }
+
     /**
      * Display a listing of the resource.
      */
-    public function index() {
+    public function index()
+    {
         return view('listings.index', [
-            'listings' => Listing::latest()->filter(request(['tag', 'search']))->paginate(2)
+            'listings' => Listing::latest()->filter(request(['tag', 'search']))->paginate(2),
         ]);
     }
 
@@ -42,14 +45,14 @@ class ListingsController extends Controller implements HasMiddleware
     {
         $data = $request->validated();
         if ($request->hasFile('logo')) {
-        $path = $request->file('logo')->store('listings', 'public');
-        $data['logo'] = $path;
-    }
+            $path = $request->file('logo')->store('listings', 'public');
+            $data['logo'] = $path;
+        }
 
-    $data['user_id'] = Auth::id();
-    Listing::create($data);
+        $data['user_id'] = Auth::id();
+        Listing::create($data);
 
-    return redirect('/')->with('message', 'job created sucessfully!');
+        return redirect('/')->with('message', __('main.job_created'));
     }
 
     /**
@@ -58,7 +61,7 @@ class ListingsController extends Controller implements HasMiddleware
     public function show(Listing $listing)
     {
         return view('listings.show', [
-        'listing' => $listing
+            'listing' => $listing,
         ]);
     }
 
@@ -67,7 +70,7 @@ class ListingsController extends Controller implements HasMiddleware
      */
     public function edit(Listing $listing)
     {
-        return view('Listings.edit',['listing'=>$listing]);
+        return view('Listings.edit', ['listing' => $listing]);
     }
 
     /**
@@ -75,22 +78,23 @@ class ListingsController extends Controller implements HasMiddleware
      */
     public function update(Listingstoreandupdate $request, Listing $listing)
     {
-        if($listing->user_id != Auth::id()) {
-            abort(403, 'Unauthorized Action');
+        if ($listing->user_id != Auth::id()) {
+            abort(403, __('main.unauthorized'));
         }
         $data = $request->validated();
         if ($request->hasFile('logo')) {
-            if(!empty($listing->logo)&&Storage::exists($listing->logo)){
-        Storage::delete($listing->logo);
-        }
-        $path = $request->file('logo')->store('listings', 'public');
-        $data['logo'] = $path;
-        }else{
+            if (! empty($listing->logo) && Storage::exists($listing->logo)) {
+                Storage::delete($listing->logo);
+            }
+            $path = $request->file('logo')->store('listings', 'public');
+            $data['logo'] = $path;
+        } else {
             unset($data['logo']);
         }
 
         $listing->update($data);
-        return redirect('/')->with('message','job Updated sucessfully!');
+
+        return redirect('/')->with('message', __('main.job_updated'));
     }
 
     /**
@@ -98,25 +102,25 @@ class ListingsController extends Controller implements HasMiddleware
      */
     public function destroy(Listing $listing)
     {
-        if($listing->user_id != Auth::id()) {
-            abort(403, 'Unauthorized Action');
+        if ($listing->user_id != Auth::id()) {
+            abort(403, __('main.unauthorized'));
         }
 
         if ($listing->logo && Storage::disk('public')->exists($listing->logo)) {
             Storage::disk('public')->delete($listing->logo);
         }
-            $listing->delete();
+        $listing->delete();
 
-    return redirect('/')->with('message', 'Job deleted successfully!');
+        return redirect('/')->with('message', __('main.job_deleted'));
     }
 
     public function manage()
     {
-       /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         return view('listings.manage', [
-            'listings' => $user->listings()->get()
+            'listings' => $user->listings()->get(),
         ]);
     }
 }
